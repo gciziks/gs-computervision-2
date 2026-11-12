@@ -1,0 +1,11 @@
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.json -text whitespace=cr-at-eol
+*.csv -text whitespace=cr-at-eol
+*.ipynb -text whitespace=cr-at-eol
+*.png binary
+*.pdf binary
+*.mp4 binary

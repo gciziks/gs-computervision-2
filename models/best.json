@@ -1,0 +1,9 @@
+{
+  "sha256": "d503b3a8df846827b67c6717edde10958e70e34f58c5ac64d5c0e8e3c85ac9ec",
+  "imgsz": 640,
+  "confidence": 0.35,
+  "class_names": {
+    "0": "residuo"
+  },
+  "selection_split": "val"
+}

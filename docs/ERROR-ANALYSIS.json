@@ -1,0 +1,32 @@
+[
+  {
+    "image": "000103.jpg",
+    "observation": "A garrafa maior foi localizada. Quatro resíduos anotados, incluindo fragmentos pequenos no fundo seco, ficaram sem correspondência.",
+    "hypothesis": "Poucos pixels e baixo contraste podem dificultar a representação dos fragmentos; é uma hipótese visual, não uma explicação causal comprovada.",
+    "proposed_correction": "Ampliar exemplos de objetos pequenos no treino e avaliar recortes com preservação de contexto, usando somente a validação para selecionar a mudança."
+  },
+  {
+    "image": "000104.jpg",
+    "observation": "Há plásticos próximos e parcialmente sobrepostos. Algumas caixas cobrem mais de uma região anotada; duas predições não atingiram o pareamento exigido e doze objetos ficaram sem correspondência.",
+    "hypothesis": "O agrupamento visual dos objetos e a diferença entre a caixa prevista e cada instância anotada podem reduzir a IoU.",
+    "proposed_correction": "Revisar o critério de instância nas anotações e incluir mais cenas densas no treino, preservando o protocolo de avaliação."
+  },
+  {
+    "image": "000113.jpg",
+    "observation": "Uma garrafa foi localizada e houve uma detecção adicional em uma região escura perto da borda inferior. A fotografia não integra o PDF por conter placas legíveis.",
+    "hypothesis": "Textura e contraste do fundo podem produzir uma resposta semelhante à dos resíduos anotados.",
+    "proposed_correction": "Coletar negativos revisados com pedras, sombras e vegetação e medir a taxa de falsos alertas em um novo conjunto independente."
+  },
+  {
+    "image": "000115.jpg",
+    "observation": "Os três objetos anotados junto à cerca não foram detectados acima do limiar de 0,35.",
+    "hypothesis": "O tamanho reduzido e o contraste dos objetos com areia e sombra podem contribuir para as perdas.",
+    "proposed_correction": "Ampliar exemplos semelhantes no treino e comparar estratégias de recorte. A resolução de 960 já foi testada na validação e não melhorou a AP50–95 nesta execução."
+  },
+  {
+    "image": "000119.jpg",
+    "observation": "A embalagem anotada foi localizada, mas surgiu uma detecção adicional na borda direita da cena.",
+    "hypothesis": "A predição extra pode estar associada a padrões de vegetação e contraste semelhantes aos das embalagens.",
+    "proposed_correction": "Adicionar negativos revisados com vegetação e avaliar separadamente objetos que aparecem parcialmente nas bordas."
+  }
+]

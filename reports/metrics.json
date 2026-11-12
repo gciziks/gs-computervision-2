@@ -1,0 +1,163 @@
+{
+  "model": {
+    "name": "YOLO26n — residuo",
+    "sha256": "d503b3a8df846827b67c6717edde10958e70e34f58c5ac64d5c0e8e3c85ac9ec",
+    "weights": "models/best.pt"
+  },
+  "dataset": {
+    "train_images": 544,
+    "train_instances": 1854,
+    "val_images": 117,
+    "val_instances": 345,
+    "test_images": 117,
+    "test_instances": 395,
+    "annotation_sha256": "812c2e3f0d336b437f276597715de2abb08bb8a641599c45f593d233ec66457b",
+    "source": "TACO",
+    "independent_negatives": 0,
+    "note": "Sem ensaio local independente ou coleta própria nesta execução."
+  },
+  "evaluation": {
+    "precision": 0.5423076923076923,
+    "recall": 0.3569620253164557,
+    "f1": 0.4305343511450382,
+    "true_positives": 141,
+    "false_positives": 119,
+    "false_negatives": 254,
+    "map50": 0.38516873626078185,
+    "map50_95": 0.24995961410824616,
+    "confidence": 0.35,
+    "iou": 0.5,
+    "selection_split": "val",
+    "evaluation_split": "test",
+    "ap_note": "AP integrada pela Ultralytics; precisão/recall/F1 em limiar fixo, com pareamento por confiança e IoU 0,50."
+  },
+  "benchmark": {
+    "device": "0",
+    "imgsz": 640,
+    "images": 30,
+    "warmup": "modelo aquecido antes da medição",
+    "p50_ms": 18.72074999846518,
+    "p95_ms": 25.37271999754011,
+    "fps": 51.38190784850606,
+    "scope": "Inferência + anotação em imagens pré-decodificadas; sem captura/exibição."
+  },
+  "training": {
+    "base_model": "yolo26n.pt",
+    "epochs_requested": 60,
+    "epochs_completed": 60,
+    "batch": 16,
+    "imgsz": 640,
+    "seed": 42,
+    "duration_seconds": 1136.87,
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "torch": "2.14.1+cu130",
+    "ultralytics": "8.4.211",
+    "results_csv": "reports/training/results.csv"
+  },
+  "figures": [
+    {
+      "path": "outputs/evaluation/exemplo-000103.png",
+      "caption": "000103.jpg: verde = predição; azul = anotação. Imagem do teste interno TACO."
+    },
+    {
+      "path": "outputs/evaluation/exemplo-000104.png",
+      "caption": "000104.jpg: verde = predição; azul = anotação. Imagem do teste interno TACO."
+    },
+    {
+      "path": "outputs/evaluation/exemplo-000115.png",
+      "caption": "000115.jpg: verde = predição; azul = anotação. Imagem do teste interno TACO."
+    },
+    {
+      "path": "outputs/evaluation/exemplo-000119.png",
+      "caption": "000119.jpg: verde = predição; azul = anotação. Imagem do teste interno TACO."
+    },
+    {
+      "path": "reports/training/results.png",
+      "caption": "Treinamento e validação: results.png. Não são métricas do teste reservado."
+    },
+    {
+      "path": "reports/training/BoxPR_curve.png",
+      "caption": "Treinamento e validação: BoxPR_curve.png. Não são métricas do teste reservado."
+    },
+    {
+      "path": "reports/training/BoxF1_curve.png",
+      "caption": "Treinamento e validação: BoxF1_curve.png. Não são métricas do teste reservado."
+    },
+    {
+      "path": "reports/evaluation/comparacao-validacao.png",
+      "caption": "Comparação na mesma validação, sem usar o teste. Referência com uma época e batch 8; ajuste completo com batch 16. Não é uma ablação isolada do número de épocas."
+    }
+  ],
+  "errors": [
+    {
+      "image": "000103.jpg",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 4,
+      "description": "0 falso(s) positivo(s) e 4 falso(s) negativo(s) no limiar escolhido pela validação e IoU 0,50.",
+      "observation": "A garrafa maior foi localizada. Quatro resíduos anotados, incluindo fragmentos pequenos no fundo seco, ficaram sem correspondência.",
+      "hypothesis": "Poucos pixels e baixo contraste podem dificultar a representação dos fragmentos; é uma hipótese visual, não uma explicação causal comprovada.",
+      "proposed_correction": "Ampliar exemplos de objetos pequenos no treino e avaliar recortes com preservação de contexto, usando somente a validação para selecionar a mudança."
+    },
+    {
+      "image": "000104.jpg",
+      "true_positives": 2,
+      "false_positives": 2,
+      "false_negatives": 12,
+      "description": "2 falso(s) positivo(s) e 12 falso(s) negativo(s) no limiar escolhido pela validação e IoU 0,50.",
+      "observation": "Há plásticos próximos e parcialmente sobrepostos. Algumas caixas cobrem mais de uma região anotada; duas predições não atingiram o pareamento exigido e doze objetos ficaram sem correspondência.",
+      "hypothesis": "O agrupamento visual dos objetos e a diferença entre a caixa prevista e cada instância anotada podem reduzir a IoU.",
+      "proposed_correction": "Revisar o critério de instância nas anotações e incluir mais cenas densas no treino, preservando o protocolo de avaliação."
+    },
+    {
+      "image": "000113.jpg",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "description": "1 falso(s) positivo(s) e 0 falso(s) negativo(s) no limiar escolhido pela validação e IoU 0,50.",
+      "observation": "Uma garrafa foi localizada e houve uma detecção adicional em uma região escura perto da borda inferior. A fotografia não integra o PDF por conter placas legíveis.",
+      "hypothesis": "Textura e contraste do fundo podem produzir uma resposta semelhante à dos resíduos anotados.",
+      "proposed_correction": "Coletar negativos revisados com pedras, sombras e vegetação e medir a taxa de falsos alertas em um novo conjunto independente."
+    },
+    {
+      "image": "000115.jpg",
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "description": "0 falso(s) positivo(s) e 3 falso(s) negativo(s) no limiar escolhido pela validação e IoU 0,50.",
+      "observation": "Os três objetos anotados junto à cerca não foram detectados acima do limiar de 0,35.",
+      "hypothesis": "O tamanho reduzido e o contraste dos objetos com areia e sombra podem contribuir para as perdas.",
+      "proposed_correction": "Ampliar exemplos semelhantes no treino e comparar estratégias de recorte. A resolução de 960 já foi testada na validação e não melhorou a AP50–95 nesta execução."
+    },
+    {
+      "image": "000119.jpg",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "description": "1 falso(s) positivo(s) e 0 falso(s) negativo(s) no limiar escolhido pela validação e IoU 0,50.",
+      "observation": "A embalagem anotada foi localizada, mas surgiu uma detecção adicional na borda direita da cena.",
+      "hypothesis": "A predição extra pode estar associada a padrões de vegetação e contraste semelhantes aos das embalagens.",
+      "proposed_correction": "Adicionar negativos revisados com vegetação e avaliar separadamente objetos que aparecem parcialmente nas bordas."
+    }
+  ],
+  "limitations": [
+    "Não houve teste com negativos independentes.",
+    "Licenças de imagem têm metadados incompletos; ver data card.",
+    "Webcam e cenário urbano real ainda precisam de ensaio físico.",
+    "Precisão, recall e AP50 ficaram abaixo das metas internas de 0,75; não há alegação de acurácia operacional."
+  ],
+  "experiments": [
+    {
+      "name": "Referência inicial",
+      "epochs": 1,
+      "batch": 8,
+      "validation_map50": 0.023880169831029995
+    },
+    {
+      "name": "Ajuste completo",
+      "epochs": 60,
+      "batch": 16,
+      "validation_map50": 0.4744804325242074
+    }
+  ]
+}

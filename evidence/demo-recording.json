@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-11-12T02:02:24.531115+00:00",
+  "weights_sha256": "d503b3a8df846827b67c6717edde10958e70e34f58c5ac64d5c0e8e3c85ac9ec",
+  "metrics_sha256": "544a3f487d67f86e58b50aa25891e1de9c7e9cd4e54349cdf8374806c6bade4f",
+  "confidence": 0.35,
+  "actions": [
+    {
+      "kind": "image",
+      "image_id": 103,
+      "wait_seconds": 25.93699999999808,
+      "status": "2 resíduos detectados acima de 0.35. Processamento: 319.0 ms. As coordenadas estão em pixels da imagem original."
+    },
+    {
+      "kind": "image",
+      "image_id": 104,
+      "wait_seconds": 1.875,
+      "status": "4 resíduos detectados acima de 0.35. Processamento: 330.1 ms. As coordenadas estão em pixels da imagem original."
+    },
+    {
+      "kind": "video_montage",
+      "source_image_ids": [
+        103,
+        104
+      ],
+      "wait_seconds": 3.4840000000040163,
+      "source_is_real_capture": false
+    }
+  ],
+  "camera_used": false,
+  "predictions_mocked": false,
+  "video_source": "montagem identificada de imagens estáticas do teste TACO",
+  "output": "olholimpo-demo.mp4"
+}

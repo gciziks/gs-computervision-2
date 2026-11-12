@@ -1,0 +1,20 @@
+{
+  "selection_split": "val",
+  "checkpoint_sha256": "d503b3a8df846827b67c6717edde10958e70e34f58c5ac64d5c0e8e3c85ac9ec",
+  "candidates": [
+    {
+      "imgsz": 640,
+      "map50": 0.4744804325242074,
+      "map50_95": 0.31088996975259897
+    },
+    {
+      "imgsz": 960,
+      "map50": 0.4827784300491872,
+      "map50_95": 0.3098823312231307
+    }
+  ],
+  "selected_imgsz": 640,
+  "rule": "Adotar 960 somente se AP50-95 melhorar mais de 0,005 na validação.",
+  "parameters_preserved_in_portable_checkpoint": true,
+  "local_paths_absent_from_checkpoint": true
+}

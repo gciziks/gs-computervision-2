@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/gciziks/gs-computervision-2",
+  "video": "https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/olholimpo-demo.mp4",
+  "weights": "https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/best.pt",
+  "report": "https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/olholimpo-relatorio.pdf"
+}

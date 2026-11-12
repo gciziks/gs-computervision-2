@@ -1,0 +1,362 @@
+[
+  {
+    "source_id": 0,
+    "source_name": "Aluminium foil",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 1,
+    "source_name": "Battery",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 2,
+    "source_name": "Aluminium blister pack",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 3,
+    "source_name": "Carded blister pack",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 4,
+    "source_name": "Other plastic bottle",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 5,
+    "source_name": "Clear plastic bottle",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 6,
+    "source_name": "Glass bottle",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 7,
+    "source_name": "Plastic bottle cap",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 8,
+    "source_name": "Metal bottle cap",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 9,
+    "source_name": "Broken glass",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 10,
+    "source_name": "Food Can",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 11,
+    "source_name": "Aerosol",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 12,
+    "source_name": "Drink can",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 13,
+    "source_name": "Toilet tube",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 14,
+    "source_name": "Other carton",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 15,
+    "source_name": "Egg carton",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 16,
+    "source_name": "Drink carton",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 17,
+    "source_name": "Corrugated carton",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 18,
+    "source_name": "Meal carton",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 19,
+    "source_name": "Pizza box",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 20,
+    "source_name": "Paper cup",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 21,
+    "source_name": "Disposable plastic cup",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 22,
+    "source_name": "Foam cup",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 23,
+    "source_name": "Glass cup",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 24,
+    "source_name": "Other plastic cup",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 25,
+    "source_name": "Food waste",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 26,
+    "source_name": "Glass jar",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 27,
+    "source_name": "Plastic lid",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 28,
+    "source_name": "Metal lid",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 29,
+    "source_name": "Other plastic",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 30,
+    "source_name": "Magazine paper",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 31,
+    "source_name": "Tissues",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 32,
+    "source_name": "Wrapping paper",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 33,
+    "source_name": "Normal paper",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 34,
+    "source_name": "Paper bag",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 35,
+    "source_name": "Plastified paper bag",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 36,
+    "source_name": "Plastic film",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 37,
+    "source_name": "Six pack rings",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 38,
+    "source_name": "Garbage bag",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 39,
+    "source_name": "Other plastic wrapper",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 40,
+    "source_name": "Single-use carrier bag",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 41,
+    "source_name": "Polypropylene bag",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 42,
+    "source_name": "Crisp packet",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 43,
+    "source_name": "Spread tub",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 44,
+    "source_name": "Tupperware",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 45,
+    "source_name": "Disposable food container",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 46,
+    "source_name": "Foam food container",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 47,
+    "source_name": "Other plastic container",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 48,
+    "source_name": "Plastic glooves",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 49,
+    "source_name": "Plastic utensils",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 50,
+    "source_name": "Pop tab",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 51,
+    "source_name": "Rope & strings",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 52,
+    "source_name": "Scrap metal",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 53,
+    "source_name": "Shoe",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 54,
+    "source_name": "Squeezable tube",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 55,
+    "source_name": "Plastic straw",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 56,
+    "source_name": "Paper straw",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 57,
+    "source_name": "Styrofoam piece",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 58,
+    "source_name": "Unlabeled litter",
+    "target_id": 0,
+    "target_name": "residuo"
+  },
+  {
+    "source_id": 59,
+    "source_name": "Cigarette",
+    "target_id": 0,
+    "target_name": "residuo"
+  }
+]

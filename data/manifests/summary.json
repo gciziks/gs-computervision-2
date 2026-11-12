@@ -1,0 +1,44 @@
+{
+  "preprocessing_version": 2,
+  "python": "3.12.6",
+  "pillow": "12.3.0",
+  "source": "https://raw.githubusercontent.com/pedropro/TACO/3844bcd3535cd12ec0218494d1d79f1372f553cc/data/annotations.json",
+  "annotations_sha256": "812c2e3f0d336b437f276597715de2abb08bb8a641599c45f593d233ec66457b",
+  "prepared_at": "2026-11-12T01:29:17.262205+00:00",
+  "seed": 42,
+  "hash_distance": 6,
+  "source_images": 1500,
+  "source_annotations": 4784,
+  "eligible_images": 778,
+  "prepared_images": 778,
+  "prepared_annotations": 2594,
+  "split_counts": {
+    "val": 117,
+    "train": 544,
+    "test": 117
+  },
+  "split_annotation_counts": {
+    "train": 1854,
+    "val": 345,
+    "test": 395
+  },
+  "groups": 778,
+  "largest_group": 1,
+  "license_counts": {
+    "CC": 316,
+    "ODBL (c) OpenLitterMap & Contributors": 462
+  },
+  "license_note": "CC não identifica variante; ODBL é a string registrada na origem. Metadados não equivalem à verificação jurídica individual. Imagens não devem ser redistribuídas sem conferir os termos.",
+  "negatives": 0,
+  "unrecorded_license_included": false,
+  "thumbnail_fallbacks": 0,
+  "exif_normalized_images": 160,
+  "limitations": [
+    "Sem negativos independentes revisados",
+    "Sem capturas próprias de teste externo",
+    "Agrupamento por dHash/origem; metadados não fornecem trajetos ou identidades de cena completas"
+  ],
+  "excluded_images": 722,
+  "download_failures": 0,
+  "max_side": 1280
+}
