@@ -139,65 +139,56 @@ Limites de imagem: 20 MB e 40 milhões de pixels. Vídeos são processados antes
 reprodução, preservando a taxa do arquivo. O codec MP4 de saída depende do OpenCV;
 a interface pode convertê-lo para compatibilidade com o navegador.
 
-## Avaliação e relatório
+## Relatório
 
-`reports/metrics.json` contém precisão, recall e F1 no limiar fixado pela validação,
-AP50/AP50–95 do teste e benchmark no dispositivo declarado. Precisão/recall usam
-pareamento de uma predição por objeto com IoU de 0,50. AP integra a curva do detector
-com o protocolo Ultralytics; os valores não são a mesma operação estatística.
+O [relatório técnico (PDF)](https://github.com/gciziks/gs-computervision-2/releases/download/v0.2.0/olholimpo-relatorio.pdf)
+reúne introdução, ferramentas, dados, metodologia, resultados, velocidade, análise de
+erros, limitações e conclusão. Os números abaixo vêm de `reports/metrics.json`, a mesma
+fonte usada pelo PDF e pela aplicação.
 
-O benchmark de imagem mede inferência e anotação depois da leitura/aquecimento;
-não inclui captura de webcam, rede ou renderização do navegador. Não use esse FPS
-como promessa de desempenho de uma câmera completa.
+| Dados (TACO) | Imagens | Objetos anotados |
+| --- | ---: | ---: |
+| Treino | 544 | 1.854 |
+| Validação | 117 | 345 |
+| Teste reservado | 117 | 395 |
 
-Para gerar os artefatos de apresentação:
+Das 1.500 imagens do TACO, 778 tinham licença registrada e caixas válidas. As 60
+categorias foram agrupadas na classe `residuo`.
 
-```powershell
-python scripts/build_report.py --render
-python scripts/build_notebook.py --execute
-```
+| Treinamento | Valor |
+| --- | --- |
+| Pesos de origem | YOLO26n pré-treinado |
+| Épocas e lote | 60 épocas, lote 16 |
+| Entrada | 640 px (960 px testada na validação, sem ganho) |
+| GPU e duração | NVIDIA GeForce RTX 3060, cerca de 19 min |
+| Limiar de confiança | 0,35, escolhido na validação |
 
-O relatório sai em `output/pdf/olholimpo-relatorio.pdf`, montado a partir de
-`docs/RELATORIO.json` (texto) e dos registros em `reports/` (números e figuras).
-O resumo e o objetivo precisam ter exatamente 250 e 50 palavras; o gerador recusa
-outra contagem.
+| Teste reservado | Valor |
+| --- | ---: |
+| Precisão | 54,2% |
+| Recall | 35,7% |
+| F1 | 43,1% |
+| AP50 | 38,5% |
+| AP50-95 | 25,0% |
+| Acertos / falsos positivos / não encontrados | 141 / 119 / 254 |
+| Latência mediana na GPU | 18,7 ms (51,4 imagens/s) |
 
-Para gravar automaticamente uma demonstração da aplicação real, instale o extra
-`demo`, o Chromium do Playwright e FFmpeg. Depois do treino e da avaliação:
+Nenhuma métrica atingiu a meta interna de 0,75. A latência conta inferência e desenho
+das caixas em imagens já decodificadas, sem leitura de arquivo, câmera ou exibição.
+Cinco imagens do teste foram revisadas uma a uma: objetos pequenos, sobrepostos e com
+fundo seco concentram as perdas. A avaliação é interna ao TACO, sem coleta própria,
+negativos independentes ou ensaio com câmera física.
 
-```powershell
-python -m pip install -e ".[demo]"
-python -m playwright install chromium
-python scripts/record_demo.py --device 0
-```
-
-A gravação mostra a interface processando imagens do teste e uma montagem curta
-dessas imagens como entrada de vídeo. A montagem é identificada; não há captura
-de webcam nem alegação de teste urbano real. O arquivo MP4 fica em `deliverables`.
-
-Preencha os integrantes em `deliverables/team.json`, com objetos `name` e `rm`.
-Informe os links em `deliverables/links.json`. O gerador não inventa nomes nem links:
-campos ausentes ficam identificados como pendentes no PDF.
-
-- [Fonte editável do relatório](docs/RELATORIO.json)
-- [Uso e limitações do modelo](docs/MODEL-CARD.md)
-- [Pesos e verificação de integridade](models/README.md)
-
-O resumo tem 250 palavras e o objetivo 50, validados pelo gerador. O PDF precisa ser
-regenerado depois de atualizar integrantes, links ou métricas. Os resultados são de
-teste interno do TACO; capturas próprias e negativos independentes devem ser
-identificados separadamente quando existirem.
-
-## Verificação
+Para gerar o PDF localmente, a partir de `docs/RELATORIO.json` (texto) e dos registros
+em `reports/` (números e figuras):
 
 ```powershell
-python -m pytest -q --basetemp=tmp/pytest
-python -m ruff check src scripts app tests
+python scripts/build_report.py
 ```
 
-Os testes cobrem conversão e validação de caixas, separação por grupos, exportação,
-tratamento de entradas inválidas, pareamento de métricas e fluxo da interface.
-A avaliação real do checkpoint é feita pelo script de avaliação, não por mocks.
+O arquivo sai em `output/pdf/olholimpo-relatorio.pdf`, e a aplicação passa a abrir essa
+cópia. Mais detalhes em [MODEL-CARD](docs/MODEL-CARD.md), [DATA-CARD](docs/DATA-CARD.md)
+e [pesos e verificação de integridade](models/README.md).
 
 ## Licenças
 
