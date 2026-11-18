@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import numpy as np
 from olholimpo.inference import inference_defaults
+from app.presentation import build_presentation
 
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +17,10 @@ CSS = """
 #intro { max-width: 74ch; margin-bottom: 1.25rem; }
 #model-status { font-size: .9rem; }
 #methodology { max-width: 80ch; }
+#presentation p, #presentation ul { max-width: 80ch; }
+#presentation h3 { margin-top: 1.5rem; margin-bottom: .6rem; }
+#presentation table { font-variant-numeric: tabular-nums; }
+#presentation a { text-underline-offset: .18em; }
 button:focus-visible, input:focus-visible { outline: 2px solid #17644d; outline-offset: 3px; }
 ::selection { background: #c6e6d9; color: #12392c; }
 """
@@ -188,16 +193,17 @@ def build_app(
             "e confira as regiões apontadas pelo modelo customizado.",
             elem_id="intro",
         )
-        model_status = gr.Markdown(controller.model_status(), elem_id="model-status")
-        confidence = gr.Slider(
-            minimum=0.05,
-            maximum=0.95,
-            value=controller.confidence,
-            step=0.05,
-            label="Confiança mínima",
-            info="Valores menores mostram mais candidatos e podem aumentar os falsos positivos.",
-        )
-        with gr.Tab("Imagem"):
+        with gr.Column(elem_id="inference-controls") as inference_controls:
+            model_status = gr.Markdown(controller.model_status(), elem_id="model-status")
+            confidence = gr.Slider(
+                minimum=0.05,
+                maximum=0.95,
+                value=controller.confidence,
+                step=0.05,
+                label="Confiança mínima",
+                info="Valores menores mostram mais candidatos e podem aumentar os falsos positivos.",
+            )
+        with gr.Tab("Imagem") as image_tab:
             with gr.Row(equal_height=True):
                 with gr.Column():
                     image_input = gr.Image(
@@ -243,7 +249,7 @@ def build_app(
                 show_progress="full",
                 api_visibility="private",
             )
-        with gr.Tab("Vídeo"):
+        with gr.Tab("Vídeo") as video_tab:
             gr.Markdown(
                 "Use um trecho de até 30 segundos e 100 MB. "
                 "Prefira MP4 com vídeo H.264 para pré-visualização no navegador. "
@@ -269,7 +275,9 @@ def build_app(
                 show_progress="full",
                 api_visibility="private",
             )
-        with gr.Accordion("Método e limites", open=False, elem_id="methodology"):
+        with gr.Tab("Apresentação") as presentation_tab:
+            build_presentation(ROOT)
+        with gr.Accordion("Método e limites", open=False, elem_id="methodology") as methodology:
             gr.Markdown(
                 "O detector usa uma classe agregada, **resíduo**, ajustada com anotações do TACO. "
                 "A confiança é um escore do modelo, não uma probabilidade calibrada. "
@@ -283,6 +291,11 @@ def build_app(
                 "Apague-os após o uso se contiverem imagens pessoais. "
                 "A aplicação não cria um link público."
             )
+        for tab in (image_tab, video_tab):
+            tab.select(lambda: (gr.update(visible=True), gr.update(visible=True)),
+                       outputs=[inference_controls, methodology], api_visibility="private", queue=False)
+        presentation_tab.select(lambda: (gr.update(visible=False), gr.update(visible=False)),
+                                outputs=[inference_controls, methodology], api_visibility="private", queue=False)
     return demo
 
 

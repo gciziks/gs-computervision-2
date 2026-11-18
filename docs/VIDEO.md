@@ -13,6 +13,12 @@ O vídeo de CV precisa mostrar o detector funcionando com os pesos treinados nes
 
 ## Roteiro
 
+As partes explicativas podem ser gravadas na aba **Apresentação** da aplicação:
+use **Projeto**, **Treinamento**, **Resultados**, **Análise de erros** e
+**Reprodução**, nessa ordem. Alterne para **Imagem** e **Vídeo** durante a execução
+real. O caso 000115 em Análise de erros inclui a fotografia anotada de uma falha.
+As curvas exibidas são de treino/validação; a tabela de Resultados é do teste.
+
 | Tempo sugerido | Mostrar | Explicar |
 | --- | --- | --- |
 | 0:00–0:30 | Título e aplicação | O problema é localizar resíduos visíveis em registros de espaços públicos. Identificar os integrantes. |

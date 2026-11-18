@@ -100,6 +100,11 @@ Imagem, envie uma foto e ajuste a confiança. A saída inclui caixas na resoluç
 original, tabela de detecções e downloads PNG/JSON/CSV. Na aba Vídeo, envie um trecho
 de até 30 segundos e 100 MB. O resumo distingue FPS do arquivo e FPS de processamento.
 
+A aba **Apresentação** reúne projeto e equipe, treinamento e curvas, métricas do
+teste, análise de erros e comandos de reprodução. Ela permite gravar a explicação
+e a demonstração no mesmo local. Os números vêm dos registros da execução ao abrir
+a aplicação; o controle de confiança da demonstração não recalcula essas métricas.
+
 Os arquivos exportados ficam em `outputs/demo`, em pastas separadas por execução.
 A interface usa apenas `127.0.0.1`; não precisa de hospedagem ou autenticação.
 
