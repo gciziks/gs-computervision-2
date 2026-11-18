@@ -27,8 +27,7 @@ inclui contagens, curvas e cinco casos de erro, sem alegar validação operacion
 
 Assista em [youtu.be/b-KZiR1OuFc](https://youtu.be/b-KZiR1OuFc). O vídeo apresenta o
 problema, os dados e o treinamento, a aplicação analisando imagens e vídeo, os
-resultados do teste reservado e os casos de erro. O roteiro está em
-[docs/VIDEO.md](docs/VIDEO.md).
+resultados do teste reservado e os casos de erro.
 
 ## Instalação
 
@@ -181,7 +180,6 @@ Informe os links em `deliverables/links.json`. O gerador não inventa nomes nem 
 campos ausentes ficam identificados como pendentes no PDF.
 
 - [Fonte editável do relatório](docs/RELATORIO.json)
-- [Roteiro e revisão do vídeo](docs/VIDEO.md)
 - [Uso e limitações do modelo](docs/MODEL-CARD.md)
 - [Pesos e verificação de integridade](models/README.md)
 
