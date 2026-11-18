@@ -1,45 +1,106 @@
-# Demonstração do OlhoLimpo
+# Roteiro do vídeo
 
-O vídeo de CV precisa mostrar o detector funcionando com os pesos treinados neste projeto. A duração de quatro a cinco minutos abaixo é uma sugestão de edição; a página de CV do enunciado não estabelece um limite.
+O vídeo precisa mostrar o detector funcionando com os pesos treinados neste projeto.
+A duração sugerida é de cerca de cinco minutos. Cada bloco pode ficar com um integrante.
 
 ## Antes de gravar
 
-- Preencher os integrantes em `deliverables/team.json` e gerar novamente o relatório.
-- Usar o checkpoint e o limiar identificados em `reports/metrics.json`.
-- Abrir a aplicação e conferir uma imagem de demonstração independente do treino.
-- Separar um vídeo curto e, para a webcam, embalagens limpas em cenário controlado.
-- Conferir áudio e tamanho dos textos. Fechar telas com informações pessoais.
-- Guardar uma captura da configuração, das curvas e das métricas que serão citadas.
+1. Rodar `python -m app.main --device 0` (ou `--device cpu`) e abrir `http://127.0.0.1:7860`
+   em tela cheia, com zoom entre 110% e 125%.
+2. Fazer uma análise de aquecimento: a primeira carrega o modelo e demora mais. Depois,
+   recarregar a página para voltar ao estado vazio.
+3. Conferir no canto superior direito "Modelo pronto em GPU 0" (ou "em CPU").
+4. Gerar o relatório com `python scripts/build_report.py`, para que o botão
+   "Ler o relatório técnico" abra a cópia local.
+5. Fechar abas e notificações. Para a webcam, deixar uma embalagem limpa e um segundo
+   terminal prontos.
 
-## Roteiro
+## Blocos
 
-As partes explicativas podem ser gravadas na aba **Apresentação** da aplicação:
-use **Projeto**, **Treinamento**, **Resultados**, **Análise de erros** e
-**Reprodução**, nessa ordem. Alterne para **Imagem** e **Vídeo** durante a execução
-real. O caso 000115 em Análise de erros inclui a fotografia anotada de uma falha.
-As curvas exibidas são de treino/validação; a tabela de Resultados é do teste.
+### 1. Abertura (0:00 a 0:30)
 
-| Tempo sugerido | Mostrar | Explicar |
-| --- | --- | --- |
-| 0:00–0:30 | Título e aplicação | O problema é localizar resíduos visíveis em registros de espaços públicos. Identificar os integrantes. |
-| 0:30–1:15 | Manifesto, configuração e curva de treino | O TACO fornece imagens e anotações. As categorias foram agregadas em uma classe e o modelo foi ajustado com dados separados para treino, validação e teste. Usar as contagens reais da execução. |
-| 1:15–2:00 | Inferência em imagem | Executar uma imagem que não participou do treino. Apontar caixas, confiança e tempo. Alterar o limiar e explicar a diferença; o limiar formal está congelado no relatório. |
-| 2:00–3:15 | Vídeo e webcam | Demonstrar o processamento contínuo, mantendo visíveis FPS e dispositivo. Variar quantidade, distância e iluminação das embalagens. Identificar a montagem como ensaio controlado. |
-| 3:15–4:15 | Métricas e falha real | Mostrar precisão, recall e AP. Apontar uma detecção errada ou objeto não detectado, sem esconder o resultado. Exportar imagem e detecções. |
-| 4:15–5:00 | README e arquivos | Mostrar como instalar, obter pesos e executar. Concluir com o que o teste comprovou e as limitações restantes. |
+Tela: aba **Analisar**, vazia.
 
-## Cuidados na apresentação
+> "Olá, nós somos [nomes]. Este é o OlhoLimpo, um detector de resíduos em imagens e vídeos.
+> Dado um registro de uma calçada, praça ou margem de rua, o modelo marca onde há lixo
+> visível, para que uma pessoa revise só essas regiões. O detector foi treinado por nós com
+> o conjunto TACO, e tudo roda localmente nesta máquina."
 
-Confiança não é garantia de acerto. Uma garrafa em uso pode ter a mesma aparência de uma descartada; o modelo não conhece a intenção do usuário. Ausência de caixa não prova que a área esteja limpa. Caixas em quadros sucessivos não são uma contagem de resíduos físicos únicos.
+### 2. Dados e treinamento (0:30 a 1:15)
 
-Não acelerar a reprodução para sugerir desempenho superior ao medido. Se houver corte para encurtar a gravação, manter a medição de tempo íntegra e explicar a edição. Usar apenas números existentes nos artefatos da execução. Não alegar coleta em campo quando as cenas foram montadas.
+Tela: **Sobre o modelo**, seção **Dados**; depois **Treinamento** no índice lateral.
 
-## Conferência final
+> "Das 1.500 imagens do TACO, 778 tinham licença registrada e caixas válidas. Juntamos as
+> 60 categorias em uma só, resíduo. Separamos 544 imagens para treino, 117 para validação e
+> 117 para teste, antes de qualquer aumento de dados."
 
-- A gravação inclui execução real, não apenas telas ou slides.
-- O checkpoint mostrado é o mesmo do relatório e da demonstração.
-- Texto, áudio e caixas são legíveis.
-- O vídeo não expõe dados pessoais ou arquivos privados.
-- O link foi testado em janela anônima e incluído na entrega.
+> "Partimos de um YOLO26n pré-treinado e ajustamos por 60 épocas numa RTX 3060, em cerca de
+> 19 minutos. Checkpoint, resolução de 640 pixels e limiar de 0,35 foram escolhidos só com a
+> validação; o teste ficou guardado para o fim. Uma rodada de uma época tinha AP50 de 2,4% na
+> validação, e o ajuste completo chegou a 47,4%."
 
-O arquivo de configuração da entrega é `deliverables/links.json`. Seu campo `video` só deve ser preenchido depois que a gravação real estiver publicada.
+### 3. Imagem (1:15 a 2:30)
+
+1. Clicar em **Analisar** e na amostra **Vários resíduos no solo**.
+   > "Esta imagem é do teste reservado; o modelo nunca a viu no treino. A confiança mínima
+   > já vem em 0,35, o valor escolhido na validação."
+2. Clicar em **Analisar imagem**.
+   > "O modelo encontrou [N] resíduos. Cada caixa tem número e confiança, e a lista ao lado
+   > traz o tempo de processamento e as coordenadas."
+3. Passar o mouse sobre os itens da lista.
+   > "Passando o mouse na lista, a caixa correspondente fica em destaque."
+4. Baixar a confiança para 0,20, analisar de novo e voltar para 0,35.
+   > "Com limiar menor aparecem mais candidatos, e também mais falsos positivos. Por isso
+   > usamos o valor da validação."
+5. Clicar em **JSON** ou **Imagem anotada**.
+   > "O resultado pode ser exportado em PNG, JSON e CSV."
+
+### 4. Vídeo (2:30 a 3:00)
+
+Clicar na amostra **Montagem de imagens do teste** e em **Analisar vídeo**. Ao terminar,
+dar play e apontar o resumo.
+
+> "O mesmo detector roda quadro a quadro. Este vídeo é uma montagem de imagens do teste,
+> não uma gravação de câmera. O resumo separa o FPS do arquivo do FPS de processamento, e
+> um mesmo objeto em vários quadros conta várias vezes."
+
+### 5. Webcam, opcional (3:00 a 3:20)
+
+Rodar `olholimpo webcam --device 0`, mostrar uma embalagem limpa, apertar **S** para salvar
+um quadro e **Q** para sair.
+
+> "Para tempo real, a webcam roda por este comando. Este é um ensaio controlado, não um
+> teste em ambiente urbano."
+
+Se este bloco for gravado, a limitação "a webcam não foi testada com uma câmera física"
+precisa ser atualizada no relatório.
+
+### 6. Resultados (3:20 a 4:15)
+
+Tela: **Sobre o modelo**, **Resultado no teste reservado**; depois **Onde erra**, imagens
+**000115** e **000104**.
+
+> "No teste, com 117 imagens e 395 objetos, a precisão foi 54,2%, o recall 35,7%, o AP50
+> 38,5% e o AP50-95 25%. Nenhuma métrica chegou à nossa meta interna de 0,75. O modelo
+> encontrou 141 objetos e perdeu 254: quando aponta algo, acerta pouco mais da metade das
+> vezes, mas deixa passar quase dois terços dos objetos."
+
+> "Nesta imagem, três objetos pequenos junto à cerca não foram detectados. Nesta outra,
+> com plásticos amontoados, 12 objetos ficaram sem correspondência. Objetos pequenos,
+> sobrepostos e com fundo seco concentram as perdas."
+
+### 7. Encerramento (4:15 a 5:00)
+
+Tela: **Reproduzir** e **Limites conhecidos**; mostrar o botão do relatório.
+
+> "Código, pesos e relatório estão no GitHub, e estes comandos reproduzem tudo, do preparo
+> dos dados à aplicação. O OlhoLimpo cumpre o ciclo completo de um projeto de visão
+> computacional, mas o resultado mostra que ele serve como apoio à triagem, sempre com
+> revisão humana. O próximo passo é testar com imagens próprias e em campo. Obrigado."
+
+## Cuidados
+
+- Falar o número que aparecer na tela; ele pode variar entre CPU e GPU.
+- Não dizer que o modelo funciona em produção ou que encontra todo o lixo.
+- Não acelerar a reprodução nem cortar a medição de tempo sem avisar.
+- Usar apenas números que estão em `reports/metrics.json` e no relatório.

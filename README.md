@@ -10,9 +10,10 @@ de detecção não comprova que o ambiente esteja limpo.
 Integrantes: Cassio Valezzi (RM551059), Gabriel Antony Cadima Ciziks (RM98215),
 Lucca Sabatini Tambellini (RM98169) e Victor Nuzzi (RM98209).
 
-Entrega: [relatório técnico](https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/olholimpo-relatorio.pdf),
+Entrega: [relatório técnico](https://github.com/gciziks/gs-computervision-2/releases/download/v0.2.0/olholimpo-relatorio.pdf),
 [vídeo demonstrativo](https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/olholimpo-demo.mp4)
 e [pesos e configuração](https://github.com/gciziks/gs-computervision-2/releases/tag/v0.1.0).
+A release v0.2.0 traz a versão revisada do relatório; pesos e vídeo continuam na v0.1.0.
 
 O checkpoint foi treinado por 60 épocas. No teste interno com 117 imagens, obteve
 precisão de 54,2%, recall de 35,7%, AP50 de 38,5% e AP50-95 de 25,0%, com confiança
@@ -95,15 +96,21 @@ na demonstração; isso não altera os números do teste registrado.
 python -m app.main --device cpu
 ```
 
-Abra o endereço local informado no terminal. Para GPU, use `--device 0`. Na aba
-Imagem, envie uma foto e ajuste a confiança. A saída inclui caixas na resolução
-original, tabela de detecções e downloads PNG/JSON/CSV. Na aba Vídeo, envie um trecho
-de até 30 segundos e 100 MB. O resumo distingue FPS do arquivo e FPS de processamento.
+Abra `http://127.0.0.1:7860` no navegador. Para GPU, use `--device 0`. A aplicação
+é uma página própria servida por FastAPI, com duas áreas:
 
-A aba **Apresentação** reúne projeto e equipe, treinamento e curvas, métricas do
-teste, análise de erros e comandos de reprodução. Ela permite gravar a explicação
-e a demonstração no mesmo local. Os números vêm dos registros da execução ao abrir
-a aplicação; o controle de confiança da demonstração não recalcula essas métricas.
+- **Analisar**: arraste ou escolha uma imagem ou um vídeo, ajuste a confiança mínima
+  e clique em analisar. As caixas aparecem sobre a imagem, com uma lista sincronizada
+  de detecções e downloads PNG/JSON/CSV. Vídeos aceitam até 30 segundos e 100 MB; o
+  resumo distingue FPS do arquivo e FPS de processamento. Com FFmpeg no PATH, o vídeo
+  anotado é convertido para H.264 e reproduzido no navegador. As imagens de
+  `data/demo` aparecem como amostras de um clique.
+- **Sobre o modelo**: métricas do teste reservado comparadas à meta interna, divisão
+  dos dados, treinamento e curvas, velocidade medida, análise de erros, equipe e
+  comandos de reprodução, com link para o relatório técnico. Se
+  `output/pdf/olholimpo-relatorio.pdf` existir, a aplicação abre essa cópia local,
+  que funciona sem internet. Os números vêm dos registros da execução; o controle de
+  confiança da análise não recalcula essas métricas.
 
 Os arquivos exportados ficam em `outputs/demo`, em pastas separadas por execução.
 A interface usa apenas `127.0.0.1`; não precisa de hospedagem ou autenticação.
@@ -141,6 +148,11 @@ Para gerar os artefatos de apresentação:
 python scripts/build_report.py --render
 python scripts/build_notebook.py --execute
 ```
+
+O relatório sai em `output/pdf/olholimpo-relatorio.pdf`, montado a partir de
+`docs/RELATORIO.json` (texto) e dos registros em `reports/` (números e figuras).
+O resumo e o objetivo precisam ter exatamente 250 e 50 palavras; o gerador recusa
+outra contagem.
 
 Para gravar automaticamente uma demonstração da aplicação real, instale o extra
 `demo`, o Chromium do Playwright e FFmpeg. Depois do treino e da avaliação:

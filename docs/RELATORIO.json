@@ -1,83 +1,78 @@
 {
   "title": "OlhoLimpo: detecção de resíduos em imagens e vídeos",
   "subtitle": "Applied Computer Vision",
-  "abstract": "O OlhoLimpo apresenta uma aplicação de visão computacional para localizar resíduos visíveis em imagens, vídeos e câmera. O problema é a dificuldade de inspecionar registros de espaços públicos sem examinar manualmente imagens. A proposta utiliza um detector ajustado por transferência de aprendizado, com uma classe agregada de resíduos. A base TACO fornece imagens e anotações, convertidas para o formato de treinamento após validação das caixas e registro da origem. A separação entre treino, validação e teste ocorre antes dos aumentos, com verificação de duplicatas e agrupamento de imagens semelhantes para reduzir vazamento. O treinamento preserva configuração, versão das dependências, curvas e identificação dos pesos. O checkpoint é selecionado pela validação; o teste reservado permite medir precisão, revocação e precisão média em diferentes critérios de sobreposição. A demonstração exibe caixas, confiança e tempos de processamento, além de permitir exportar evidências da inferência. Imagens, vídeo e câmera compartilham o mesmo núcleo de detecção. A análise inclui exemplos de acertos e falhas, distinguindo resultados do teste interno de cenas montadas com embalagens. Objetos pequenos, oclusões, fundos carregados e mudanças de iluminação são condições relevantes para interpretar os resultados. O modelo identifica aparência visual, sem determinar intenção de descarte, propriedade ou reciclabilidade. A ausência de detecção também não comprova que um ambiente esteja limpo. O trabalho concentra sua contribuição no treinamento customizado reproduzível e na demonstração verificável do detector. As métricas registradas, as limitações observadas e os comandos de execução sustentam a conclusão técnica, sem substituir a validação necessária para uso operacional em campo.",
-  "objective": "Desenvolver e avaliar um detector customizado de resíduos visíveis, utilizando imagens anotadas e separação independente de treino, validação e teste. Demonstrar a inferência em imagens, vídeo e câmera local, apresentar métricas reais de detecção e desempenho, documentar erros e disponibilizar código, pesos e instruções suficientes para reproduzir a solução implementada.",
+  "abstract": "Fotografias de calçadas, praças e margens de vias mostram embalagens, sacolas e outros resíduos misturados à vegetação, à areia e ao asfalto. Revisar todo esse material manualmente é lento, e o OlhoLimpo propõe indicar automaticamente as regiões que merecem atenção. O sistema usa um detector YOLO26n pré-treinado, ajustado com as anotações do conjunto TACO, cujas 60 categorias foram reunidas em uma única classe, resíduo. Das 1.500 imagens do conjunto, 778 tinham licença registrada e caixas válidas, e foram divididas em treino, validação e teste antes de qualquer aumento de dados, com agrupamento de quase duplicatas por hash perceptual. O modelo foi treinado por 60 épocas em uma GPU RTX 3060, e checkpoint, resolução e limiar de confiança foram escolhidos apenas com a validação. No teste reservado, com 117 imagens e 395 objetos anotados, o detector alcançou precisão de 54,2%, recall de 35,7%, AP50 de 38,5% e AP50-95 de 25,0%. Nos casos revisados, os acertos aparecem sobretudo em objetos grandes e contrastados, enquanto fragmentos pequenos, objetos sobrepostos e fundos secos concentram as perdas. Em GPU, a inferência levou cerca de 19 ms por imagem. A aplicação local permite enviar imagens e vídeos, ajustar o limiar, conferir as caixas e exportar os resultados em PNG, JSON e CSV, e a webcam é atendida por outro comando. Os números ficaram abaixo da meta interna de 0,75 e indicam um detector útil como apoio à triagem, sempre com revisão humana. Ampliar exemplos de objetos pequenos e montar um teste independente são os próximos passos.",
+  "objective": "Treinar e avaliar um detector de resíduos visíveis a partir das imagens anotadas do TACO, com conjuntos de treino, validação e teste separados. Demonstrar o modelo em imagens, vídeos e webcam, medir sua qualidade e velocidade, analisar os erros encontrados e publicar código, pesos e instruções para reproduzir o trabalho.",
   "introduction": [
-    "Fotografias e vídeos de calçadas, praças e áreas de convivência podem registrar embalagens e outros resíduos em fundos variados. Localizar esses objetos exige examinar o conteúdo visual de cada registro. A detecção de objetos oferece uma forma de destacar regiões candidatas, que podem depois ser verificadas por uma pessoa.",
-    "O TACO reúne imagens de resíduos em contexto, com anotações adequadas ao estudo de localização de objetos. O OlhoLimpo utiliza essas anotações para ajustar um detector a uma classe agregada. A escolha reduz a dependência de categorias raras e mantém o trabalho concentrado em localizar resíduos, em vez de identificar materiais.",
-    "O escopo é uma demonstração local de Computer Vision. Não inclui uma plataforma de manutenção urbana, emissão de ocorrências, classificação de reciclabilidade ou prova de descarte irregular. Uma embalagem em uso pode ter aparência equivalente à de uma descartada. Esse limite orienta a interpretação das caixas produzidas."
+    "Fotos e vídeos de espaços públicos registram com frequência embalagens, sacolas e restos de papel espalhados pelo chão. Encontrar esses objetos em um volume grande de imagens é um trabalho repetitivo. A detecção de objetos permite automatizar a primeira passada: o modelo marca regiões candidatas e uma pessoa confere o resultado.",
+    "O TACO (Trash Annotations in Context) reúne fotografias de resíduos em ambientes reais, com caixas delimitadoras anotadas à mão. Agrupamos suas 60 categorias em uma só porque muitas têm poucos exemplos e porque o objetivo aqui é localizar o lixo, não identificar o material de que ele é feito.",
+    "O escopo é uma demonstração local. O sistema não registra ocorrências, não separa recicláveis e não prova descarte irregular: uma garrafa em uso e uma garrafa abandonada têm, para o modelo, a mesma aparência."
   ],
   "tools": [
     [
       "Python",
-      "Organiza preparação dos dados, treinamento, avaliação e comandos de demonstração em um mesmo ambiente reproduzível."
+      "Linguagem de todo o pipeline, da preparação dos dados à aplicação."
     ],
     [
-      "Ultralytics e PyTorch",
-      "Executam o ajuste do detector a partir de pesos pré-treinados. O checkpoint customizado resulta do treino com a classe do projeto; pesos genéricos não substituem essa etapa."
+      "PyTorch e Ultralytics",
+      "Treinamento e inferência do detector YOLO26n."
     ],
     [
       "OpenCV",
-      "Lê imagens e quadros de vídeo, captura câmera, desenha resultados e grava evidências anotadas."
+      "Leitura de imagens e vídeos, captura da webcam e desenho das caixas."
     ],
     [
-      "Gradio",
-      "Disponibiliza uma interface local para escolher arquivos, ajustar a confiança da demonstração e consultar resultados."
+      "FastAPI",
+      "Servidor local da aplicação web usada na demonstração."
     ],
     [
-      "JSON, CSV e manifestos",
-      "Preservam configuração, identificação de imagens, rótulos originais, divisões dos dados e resultados numéricos."
-    ],
-    [
-      "ReportLab e PyMuPDF",
-      "Geram este relatório a partir dos artefatos e permitem renderizar suas páginas para revisão visual."
+      "TACO",
+      "Imagens e anotações usadas no treinamento e na avaliação."
     ]
   ],
   "methodology": [
-    "Obter a versão selecionada das anotações oficiais do TACO e registrar origem, data, hash e termos das imagens utilizadas.",
-    "Conferir integridade das imagens, dimensões e caixas. Converter as caixas COCO para o formato YOLO, preservando a identificação de origem e o mapeamento para a classe residuo.",
-    "Deduplicar imagens e agrupar cenas semelhantes antes de separar os conjuntos. Registrar IDs, hashes, contagens e seed em manifestos.",
-    "Reservar validação e teste sem aplicar aumentos nesses conjuntos. Aumentos de aparência e geometria pertencem exclusivamente ao treino.",
-    "Executar uma prova curta do pipeline e ajustar o detector. Preservar parâmetros resolvidos, dispositivo, duração, curvas e checkpoint de melhor validação.",
-    "Escolher o checkpoint e o limiar usando apenas a validação. Congelar essas escolhas antes de avaliar o teste reservado.",
-    "Calcular métricas de localização e inspecionar exemplos de acertos e erros. Medir latência e desempenho no dispositivo utilizado, distinguindo tempo de inferência e tempo completo de processamento.",
-    "Executar o mesmo núcleo em imagem, vídeo e câmera. Exportar detecções e imagens anotadas; identificar cenas controladas e não tratá-las como validação de operação urbana.",
-    "Conferir reprodução dos comandos, consistência dos artefatos e legibilidade das evidências antes de gerar o PDF e gravar o vídeo."
-  ],
-  "metric_notes": [
-    "Precisão mede a proporção das detecções consideradas corretas no protocolo de avaliação. Recall, ou revocação, mede a fração dos objetos anotados que foram recuperados.",
-    "IoU é a razão entre a área de interseção e a área de união de duas caixas. AP50 utiliza sobreposição de 0,50; AP50–95 resume a precisão média em limiares de IoU de 0,50 a 0,95.",
-    "Confiança é uma pontuação do detector e não uma probabilidade calibrada. O limiar define quais caixas são mostradas e influencia falsos positivos e objetos perdidos.",
-    "FPS da fonte não equivale a FPS de processamento. As medições precisam identificar resolução, dispositivo, aquecimento e etapas incluídas. Caixas em quadros consecutivos não são contagem de resíduos físicos únicos."
-  ],
-  "limitations": [
-    "Imagens de teste derivadas de uma mesma base não comprovam generalização para todos os bairros, câmeras ou condições de iluminação.",
-    "Objetos pequenos, sobreposição, desfoque e fundos carregados podem causar perdas ou caixas imprecisas.",
-    "Objetos em uso podem ser confundidos com resíduos. O detector não infere intenção de descarte, propriedade, composição ou risco sanitário.",
-    "Cenas montadas com embalagens são ensaios controlados e devem permanecer identificadas como tal.",
-    "Ausência de detecção não comprova ausência de resíduos; confiança não substitui revisão dos resultados."
-  ],
-  "conclusion": "A avaliação deve ser interpretada pelos valores e exemplos registrados nesta execução. O projeto permite examinar o efeito do treinamento customizado, reproduzir a inferência e inspecionar suas falhas. A aplicação local demonstra localização de objetos; sua utilização operacional exigiria ampliar a validação em cenários independentes, avaliar falsos alertas de contexto e acompanhar mudanças de câmera e ambiente. Melhorias devem partir dos erros observados, sem reutilizar o teste como conjunto de ajuste.",
-  "references": [
     [
-      "TACO: dados, ferramentas e instruções dos autores",
-      "https://github.com/pedropro/TACO"
+      "Preparação dos dados",
+      "Usamos a versão oficial das anotações do TACO e registramos origem, hash e licença de cada imagem. Foram descartadas 715 imagens sem licença registrada e 7 com caixas fora dos limites. As anotações COCO foram convertidas para o formato YOLO, com todas as categorias mapeadas para resíduo. Antes da divisão, as imagens foram agrupadas por hash perceptual (dHash) para que quase duplicatas não ficassem em conjuntos diferentes. Os manifestos guardam IDs, hashes e a seed."
     ],
     [
-      "Proença e Simões. TACO: Trash Annotations in Context for Litter Detection, 2020",
+      "Treinamento",
+      "O ajuste partiu dos pesos pré-treinados do YOLO26n. Aumentos de aparência e de geometria foram aplicados somente ao treino. Antes da execução completa, uma rodada de uma época serviu para conferir o pipeline e ficou registrada como referência."
+    ],
+    [
+      "Seleção e avaliação",
+      "O checkpoint e o limiar de confiança foram escolhidos na validação e congelados antes de abrir o teste. As métricas finais foram calculadas uma única vez no teste reservado."
+    ]
+  ],
+  "metric_note": "Precisão é a fração das caixas previstas que corresponde a um objeto anotado; recall é a fração dos objetos anotados que o modelo encontrou. Uma predição conta como acerto quando a interseção sobre união (IoU) com a anotação é de pelo menos 0,50. O AP50 resume a curva de precisão e recall nesse critério, e o AP50-95 faz a média entre IoU de 0,50 e 0,95, exigindo caixas mais justas. A confiança é um escore do modelo, não uma probabilidade calibrada.",
+  "limitations": [
+    "A avaliação é interna ao TACO. Não houve coleta própria, teste com imagens sem resíduos nem ensaio em campo.",
+    "A webcam não foi testada com uma câmera física, e o vídeo da demonstração é uma montagem de imagens do teste.",
+    "O dHash separa quase duplicatas, mas os metadados do TACO não garantem que o mesmo local não apareça em mais de um conjunto.",
+    "O modelo reconhece aparência. Ele não sabe se um objeto foi descartado, e a ausência de caixas não significa que o local esteja limpo.",
+    "As licenças registradas no TACO são genéricas em parte dos casos; o DATA-CARD detalha cada uma antes de qualquer redistribuição."
+  ],
+  "next_steps": "Os erros revisados apontam três frentes: mais exemplos de objetos pequenos e de cenas densas, uma revisão das anotações em grupos de objetos sobrepostos e imagens sem resíduos para medir falsos alarmes. Como o teste atual já foi examinado na análise de erros, qualquer nova rodada de ajustes precisa de um teste novo para que a comparação continue válida.",
+  "conclusion": "O OlhoLimpo cumpre o percurso completo de um projeto de visão computacional: o detector foi treinado para o problema, avaliado em um teste que não participou das decisões e demonstrado em uma aplicação que roda localmente. O resultado, porém, mostra um modelo que ainda deixa passar quase dois terços dos objetos anotados. Ele serve para destacar candidatos em uma triagem, não para substituir a inspeção.",
+  "references": [
+    [
+      "Proença, P. F.; Simões, P. TACO: Trash Annotations in Context for Litter Detection. 2020.",
       "https://arxiv.org/abs/2003.06975"
     ],
     [
-      "Ultralytics: treinamento",
+      "TACO: dados, ferramentas e instruções dos autores.",
+      "https://github.com/pedropro/TACO"
+    ],
+    [
+      "Ultralytics. Documentação de treinamento.",
       "https://docs.ultralytics.com/modes/train/"
     ],
     [
-      "Ultralytics: validação",
+      "Ultralytics. Documentação de validação.",
       "https://docs.ultralytics.com/modes/val/"
     ],
     [
-      "Ultralytics: termos de licença",
+      "Ultralytics. Termos de licença.",
       "https://www.ultralytics.com/license"
     ]
   ]
