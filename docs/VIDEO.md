@@ -1,5 +1,8 @@
 # Roteiro do vídeo
 
+O vídeo gravado está publicado em [youtu.be/b-KZiR1OuFc](https://youtu.be/b-KZiR1OuFc).
+Este roteiro registra o que foi mostrado e serve de base para novas gravações.
+
 O vídeo precisa mostrar o detector funcionando com os pesos treinados neste projeto.
 A duração sugerida é de cerca de cinco minutos. Cada bloco pode ficar com um integrante.
 

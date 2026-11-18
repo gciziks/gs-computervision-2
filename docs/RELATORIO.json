@@ -47,7 +47,7 @@
   "metric_note": "Precisão é a fração das caixas previstas que corresponde a um objeto anotado; recall é a fração dos objetos anotados que o modelo encontrou. Uma predição conta como acerto quando a interseção sobre união (IoU) com a anotação é de pelo menos 0,50. O AP50 resume a curva de precisão e recall nesse critério, e o AP50-95 faz a média entre IoU de 0,50 e 0,95, exigindo caixas mais justas. A confiança é um escore do modelo, não uma probabilidade calibrada.",
   "limitations": [
     "A avaliação é interna ao TACO. Não houve coleta própria, teste com imagens sem resíduos nem ensaio em campo.",
-    "A webcam não foi testada com uma câmera física, e o vídeo da demonstração é uma montagem de imagens do teste.",
+    "A webcam não foi testada com uma câmera física, e o trecho de vídeo analisado na demonstração é uma montagem de imagens do teste.",
     "O dHash separa quase duplicatas, mas os metadados do TACO não garantem que o mesmo local não apareça em mais de um conjunto.",
     "O modelo reconhece aparência. Ele não sabe se um objeto foi descartado, e a ausência de caixas não significa que o local esteja limpo.",
     "As licenças registradas no TACO são genéricas em parte dos casos; o DATA-CARD detalha cada uma antes de qualquer redistribuição."

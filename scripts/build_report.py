@@ -346,6 +346,11 @@ def build_report(metrics_path: Path, output: Path, render: bool = False) -> Path
         "A aplicação também roda em CPU. Na demonstração, imagens e vídeos são enviados pelo navegador, "
         "as caixas aparecem sobre a imagem e os resultados podem ser exportados em PNG, JSON e CSV. A webcam "
         "usa um comando de terminal com janela do OpenCV."))
+    video = links.get("video")
+    if isinstance(video, str) and video.startswith("https://"):
+        story.append(para(
+            "A gravação da demonstração, com a aplicação em funcionamento, está disponível em "
+            f'<link href="{escape(video)}" color="#2C674C">{escape(video)}</link>.', markup=True))
 
     # 7. Análise de erros
     errors = [item for item in metrics.get("errors", []) if isinstance(item, dict)]

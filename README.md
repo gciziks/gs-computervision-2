@@ -10,16 +10,25 @@ de detecção não comprova que o ambiente esteja limpo.
 Integrantes: Cassio Valezzi (RM551059), Gabriel Antony Cadima Ciziks (RM98215),
 Lucca Sabatini Tambellini (RM98169) e Victor Nuzzi (RM98209).
 
-Entrega: [relatório técnico](https://github.com/gciziks/gs-computervision-2/releases/download/v0.2.0/olholimpo-relatorio.pdf),
-[vídeo demonstrativo](https://github.com/gciziks/gs-computervision-2/releases/download/v0.1.0/olholimpo-demo.mp4)
+Entrega: [vídeo de demonstração](https://youtu.be/b-KZiR1OuFc),
+[relatório técnico](https://github.com/gciziks/gs-computervision-2/releases/download/v0.2.0/olholimpo-relatorio.pdf)
 e [pesos e configuração](https://github.com/gciziks/gs-computervision-2/releases/tag/v0.1.0).
-A release v0.2.0 traz a versão revisada do relatório; pesos e vídeo continuam na v0.1.0.
+A release v0.2.0 traz a versão revisada do relatório; os pesos continuam na v0.1.0.
 
 O checkpoint foi treinado por 60 épocas. No teste interno com 117 imagens, obteve
 precisão de 54,2%, recall de 35,7%, AP50 de 38,5% e AP50-95 de 25,0%, com confiança
 0,35 escolhida na validação. As metas internas de acurácia não foram atingidas;
 objetos pequenos e fundos carregados continuam sendo limitações. O relatório
 inclui contagens, curvas e cinco casos de erro, sem alegar validação operacional.
+
+## Vídeo de demonstração
+
+[![Vídeo de demonstração do OlhoLimpo no YouTube](https://i.ytimg.com/vi/b-KZiR1OuFc/hqdefault.jpg)](https://youtu.be/b-KZiR1OuFc)
+
+Assista em [youtu.be/b-KZiR1OuFc](https://youtu.be/b-KZiR1OuFc). O vídeo apresenta o
+problema, os dados e o treinamento, a aplicação analisando imagens e vídeo, os
+resultados do teste reservado e os casos de erro. O roteiro está em
+[docs/VIDEO.md](docs/VIDEO.md).
 
 ## Instalação
 
