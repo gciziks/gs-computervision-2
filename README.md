@@ -179,17 +179,6 @@ Cinco imagens do teste foram revisadas uma a uma: objetos pequenos, sobrepostos 
 fundo seco concentram as perdas. A avaliação é interna ao TACO, sem coleta própria,
 negativos independentes ou ensaio com câmera física.
 
-Para gerar o PDF localmente, a partir de `docs/RELATORIO.json` (texto) e dos registros
-em `reports/` (números e figuras):
-
-```powershell
-python scripts/build_report.py
-```
-
-O arquivo sai em `output/pdf/olholimpo-relatorio.pdf`, e a aplicação passa a abrir essa
-cópia. Mais detalhes em [MODEL-CARD](docs/MODEL-CARD.md), [DATA-CARD](docs/DATA-CARD.md)
-e [pesos e verificação de integridade](models/README.md).
-
 ## Licenças
 
 Código sob AGPL-3.0-only, conforme [LICENSE](LICENSE). O uso de Ultralytics e dos pesos
