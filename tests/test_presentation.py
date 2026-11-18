@@ -50,3 +50,22 @@ def test_error_figures_are_limited_to_reviewed_assets(tmp_path):
     assert error_details(metrics, "000113.jpg", tmp_path)[1] is None
     assert error_details(metrics, "../../private.jpg", tmp_path)[1] is None
     assert error_details(metrics, "missing.jpg", tmp_path)[1] is None
+
+
+def test_project_payload_formats_records_and_flags_target(tmp_path):
+    from app.presentation import project_payload
+
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    metrics = {"evaluation": {"precision": 0.5423076923, "recall": 0.36, "map50": 0.38},
+               "dataset": {"train_images": 544, "train_instances": 1854},
+               "errors": [{"image": "000115.jpg", "false_negatives": 3}]}
+    (reports / "metrics.json").write_text(json.dumps(metrics), encoding="utf-8")
+    payload = project_payload(tmp_path, set())
+    scores = {item["key"]: item["text"] for item in payload["evaluation"]["scores"]}
+    assert scores["precision"] == "54,2%"
+    assert scores["f1"] == "Não registrado"
+    assert payload["evaluation"]["below_target"] is True
+    assert payload["dataset"]["splits"][0]["instances_text"] == "1.854"
+    assert payload["errors"][0]["figure"] is None
+    assert payload["links"] == {}

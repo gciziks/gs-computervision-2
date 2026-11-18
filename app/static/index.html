@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OlhoLimpo</title>
+  <meta name="description" content="Detector de resíduos em imagens e vídeos treinado com o TACO.">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+
+  <header class="topbar">
+    <a class="brand" href="#analisar" aria-label="OlhoLimpo, início">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" rx="12" fill="var(--ink)"/>
+        <path d="M12 22V12h10M42 12h10v10M52 42v10H42M22 52H12V42" fill="none" stroke="var(--signal)" stroke-width="5" stroke-linecap="square"/>
+        <ellipse cx="32" cy="32" rx="13" ry="8" fill="none" stroke="var(--bg)" stroke-width="4"/>
+        <circle cx="32" cy="32" r="3.5" fill="var(--bg)"/>
+      </svg>
+      <h1>OlhoLimpo</h1>
+    </a>
+    <nav class="nav" aria-label="Seções">
+      <a href="#analisar" data-view="analisar">Analisar</a>
+      <a href="#projeto" data-view="projeto">Sobre o modelo</a>
+    </nav>
+    <div class="status" id="model-status" data-state="loading" role="status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-text">Verificando modelo</span>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- Analisar -->
+    <section class="view" id="view-analisar" data-view="analisar" aria-labelledby="analisar-title">
+      <h2 class="sr-only" id="analisar-title">Analisar arquivo</h2>
+      <div class="workspace">
+        <div class="stage-col">
+          <div class="stage" id="stage" data-state="empty">
+            <label class="dropzone" id="dropzone" for="file-image">
+              <span class="drop-frame" aria-hidden="true"></span>
+              <span class="drop-title" id="drop-title">Arraste uma imagem para cá</span>
+              <span class="drop-sub" id="drop-sub">JPG, PNG ou WebP com até 20 MB</span>
+              <span class="button button-ghost" id="drop-button">Escolher arquivo</span>
+            </label>
+            <input class="sr-only" type="file" id="file-image" accept="image/jpeg,image/png,image/webp,image/bmp">
+            <input class="sr-only" type="file" id="file-video" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm">
+
+            <div class="viewer" id="viewer" hidden>
+              <div class="viewer-bar">
+                <span class="file-name" id="file-name"></span>
+                <div class="viewer-actions">
+                  <button class="chip-toggle" type="button" id="toggle-boxes" aria-pressed="true" hidden>Caixas visíveis</button>
+                  <button class="chip-toggle" type="button" id="replace-file">Trocar arquivo</button>
+                </div>
+              </div>
+              <div class="viewer-body">
+                <figure class="frame" id="frame">
+                  <img id="preview" alt="">
+                  <div class="boxes" id="boxes" aria-hidden="true"></div>
+                </figure>
+                <video id="video-preview" controls playsinline hidden></video>
+                <div class="scan" aria-hidden="true"><span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <section class="samples" id="samples" aria-labelledby="samples-title" hidden>
+            <h3 id="samples-title">Experimente com amostras do teste reservado</h3>
+            <div class="sample-row" id="sample-row"></div>
+          </section>
+        </div>
+
+        <aside class="inspector" aria-label="Controles e resultado">
+          <div class="segmented" role="tablist" aria-label="Tipo de arquivo">
+            <button role="tab" type="button" id="tab-image" aria-selected="true" aria-controls="stage">Imagem</button>
+            <button role="tab" type="button" id="tab-video" aria-selected="false" aria-controls="stage">Vídeo</button>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="confidence">Confiança mínima</label>
+              <output id="confidence-value" for="confidence">0,35</output>
+            </div>
+            <input type="range" id="confidence" min="0.05" max="0.95" step="0.05" value="0.35">
+            <p class="hint" id="confidence-hint">Valores menores mostram mais candidatos e aumentam os falsos positivos. O padrão foi escolhido na validação.</p>
+          </div>
+
+          <button class="button button-primary" type="button" id="analyze-image" disabled>Analisar imagem</button>
+          <button class="button button-primary" type="button" id="analyze-video" disabled hidden>Analisar vídeo</button>
+
+          <div class="alert" id="alert" role="alert" hidden></div>
+          <p class="stale" id="stale" hidden>A confiança mudou desde a última análise. Analise novamente para atualizar.</p>
+
+          <section class="result" id="result" aria-live="polite" data-state="idle">
+            <div class="result-empty" id="result-empty">
+              <p class="result-empty-title">Nenhuma análise ainda</p>
+              <p>Escolha um arquivo ou uma amostra e toque em analisar. As regiões encontradas aparecem sobre a imagem e nesta lista.</p>
+            </div>
+
+            <div class="result-image" id="result-image" hidden>
+              <div class="headline">
+                <span class="headline-number" id="count">0</span>
+                <span class="headline-label" id="count-label">resíduos detectados</span>
+              </div>
+              <p class="meta" id="image-meta"></p>
+              <ol class="detections" id="detections"></ol>
+              <p class="note" id="empty-note" hidden>Nenhuma região passou do limiar. Isso não garante que o ambiente esteja sem resíduos.</p>
+            </div>
+
+            <div class="result-video" id="result-video" hidden>
+              <h3 class="result-title">Resumo do processamento</h3>
+              <dl class="stats" id="video-stats"></dl>
+              <p class="note">Caixas em quadros diferentes podem representar o mesmo objeto. As detecções somam todos os quadros.</p>
+            </div>
+
+            <div class="downloads" id="downloads" hidden>
+              <h3 class="result-title">Exportar</h3>
+              <div class="download-row" id="download-row"></div>
+            </div>
+          </section>
+
+          <p class="model-line" id="model-line"></p>
+        </aside>
+      </div>
+
+      <details class="limits">
+        <summary>Método e limites</summary>
+        <div class="limits-body">
+          <p>O detector usa uma classe agregada, <strong>resíduo</strong>, ajustada com anotações do TACO. A confiança é um escore do modelo, não uma probabilidade calibrada.</p>
+          <p>O modelo identifica aparência visual: não comprova descarte irregular, reciclabilidade ou risco sanitário. Objetos pequenos, sobrepostos e fundos carregados podem causar erros.</p>
+          <p>A captura contínua da webcam roda pelo comando <code>olholimpo webcam --device 0</code>. Os arquivos exportados ficam em <code>outputs/demo</code> nesta máquina, e a aplicação não cria link público.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- Sobre o modelo -->
+    <section class="view" id="view-projeto" data-view="projeto" aria-labelledby="projeto-title" hidden>
+      <div class="doc">
+        <nav class="toc" aria-label="Nesta página">
+          <a href="#sec-resultados">Resultados</a>
+          <a href="#sec-dados">Dados</a>
+          <a href="#sec-treino">Treinamento</a>
+          <a href="#sec-velocidade">Velocidade</a>
+          <a href="#sec-erros">Onde erra</a>
+          <a href="#sec-equipe">Equipe</a>
+          <a href="#sec-reproduzir">Reproduzir</a>
+        </nav>
+
+        <div class="doc-body">
+          <header class="doc-hero">
+            <h2 id="projeto-title">Um detector ajustado para uma pergunta só: há resíduo visível nesta imagem?</h2>
+            <p>O OlhoLimpo localiza resíduos em fotos e vídeos de espaços públicos. Ele parte de um YOLO pré-treinado e recebe ajuste supervisionado com as caixas do TACO. Os números abaixo são lidos dos registros da execução, sem recálculo.</p>
+            <p class="model-chip" id="doc-model"></p>
+            <p><a class="button button-line" id="doc-report" target="_blank" rel="noopener" hidden>Ler o relatório técnico (PDF)</a></p>
+            <div class="alert alert-soft" id="doc-issues" hidden></div>
+          </header>
+
+          <section class="doc-section" id="sec-resultados" aria-labelledby="h-resultados">
+            <h3 id="h-resultados">Resultado no teste reservado</h3>
+            <p class="lede" id="eval-lede"></p>
+            <div class="meters" id="meters"></div>
+            <div class="counts" id="counts"></div>
+            <p class="callout" id="target-note" hidden></p>
+            <p class="small">Alterar a confiança na tela de análise não recalcula estes valores.</p>
+          </section>
+
+          <section class="doc-section" id="sec-dados" aria-labelledby="h-dados">
+            <h3 id="h-dados">Dados</h3>
+            <p class="lede">Imagens e caixas do TACO, convertidas de COCO para YOLO. Os conjuntos não compartilham arquivos nem grupos quase idênticos encontrados por hash perceptual. Aumentos de dados só entram no treino.</p>
+            <div class="split" id="split"></div>
+            <table class="table" id="split-table">
+              <thead><tr><th scope="col">Conjunto</th><th scope="col" class="num">Imagens</th><th scope="col" class="num">Objetos anotados</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </section>
+
+          <section class="doc-section" id="sec-treino" aria-labelledby="h-treino">
+            <h3 id="h-treino">Treinamento</h3>
+            <p class="lede">O checkpoint e a confiança mínima foram escolhidos pela validação. O teste só foi usado para a avaliação final.</p>
+            <div class="two-col">
+              <dl class="facts" id="training-facts"></dl>
+              <div>
+                <h4>Execuções comparadas na validação</h4>
+                <table class="table" id="experiments"><thead><tr><th scope="col">Execução</th><th scope="col" class="num">Épocas</th><th scope="col" class="num">Lote</th><th scope="col" class="num">AP50</th></tr></thead><tbody></tbody></table>
+                <p class="small">Épocas e lote mudaram juntos, então a comparação não isola o efeito de uma única variável.</p>
+                <h4>Resolução de entrada</h4>
+                <table class="table" id="resolution"><thead><tr><th scope="col">Entrada</th><th scope="col" class="num">AP50</th><th scope="col" class="num">AP50-95</th></tr></thead><tbody></tbody></table>
+                <p class="small" id="resolution-note"></p>
+              </div>
+            </div>
+            <div class="figures" id="figures"></div>
+          </section>
+
+          <section class="doc-section" id="sec-velocidade" aria-labelledby="h-velocidade">
+            <h3 id="h-velocidade">Velocidade medida</h3>
+            <dl class="facts facts-inline" id="benchmark"></dl>
+            <p class="small">Inclui inferência e anotação sobre imagens já decodificadas. Não inclui leitura de arquivo, câmera ou exibição.</p>
+          </section>
+
+          <section class="doc-section" id="sec-erros" aria-labelledby="h-erros">
+            <h3 id="h-erros">Onde o modelo erra</h3>
+            <p class="lede">Casos do teste revisados um a um. As causas são hipóteses visuais; as correções propostas ainda precisam de novos experimentos.</p>
+            <div class="cases">
+              <div class="case-list" id="case-list" role="tablist" aria-label="Casos de erro" aria-orientation="vertical"></div>
+              <article class="case" id="case" role="tabpanel"></article>
+            </div>
+          </section>
+
+          <section class="doc-section" id="sec-equipe" aria-labelledby="h-equipe">
+            <h3 id="h-equipe">Equipe</h3>
+            <ul class="team" id="team"></ul>
+          </section>
+
+          <section class="doc-section" id="sec-reproduzir" aria-labelledby="h-reproduzir">
+            <h3 id="h-reproduzir">Reproduzir</h3>
+            <div class="link-row" id="links"></div>
+            <div class="commands">
+              <div class="command"><span>Abrir a aplicação</span><code>python -m app.main --device cpu</code><button type="button" class="copy">Copiar</button></div>
+              <div class="command"><span>Webcam local</span><code>olholimpo webcam --device 0</code><button type="button" class="copy">Copiar</button></div>
+              <div class="command"><span>Preparar, treinar e avaliar</span><code>python scripts/prepare_data.py &amp;&amp; python scripts/train.py --device 0 &amp;&amp; python scripts/evaluate.py --device 0</code><button type="button" class="copy">Copiar</button></div>
+            </div>
+            <h4>Limites conhecidos</h4>
+            <ul class="bullets" id="limitations"></ul>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>OlhoLimpo, projeto de Applied Computer Vision. Roda localmente em 127.0.0.1.</p>
+  </footer>
+</body>
+</html>

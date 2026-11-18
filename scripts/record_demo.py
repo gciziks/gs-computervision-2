@@ -123,10 +123,13 @@ def record(args) -> Path:
     ffmpeg = shutil.which("ffmpeg")
     if ffmpeg is None:
         raise RuntimeError("Instale FFmpeg e deixe o executável disponível no PATH.")
-    from playwright.sync_api import sync_playwright
-    import gradio as gr
+    import threading
+    import urllib.request
 
-    from app.main import CSS, FAVICON, HEAD, build_app, build_theme
+    import uvicorn
+    from playwright.sync_api import sync_playwright
+
+    from app.main import build_app
 
     workspace = ROOT / "tmp/recording" / uuid4().hex
     workspace.mkdir(parents=True)
@@ -136,19 +139,26 @@ def record(args) -> Path:
     screenshot = ROOT / "evidence/app-result.png"
     screenshot.parent.mkdir(parents=True, exist_ok=True)
     port = args.port or free_port()
-    demo = build_app(args.weights, args.device, args.imgsz)
+    server = uvicorn.Server(uvicorn.Config(
+        build_app(args.weights, args.device, args.imgsz),
+        host="127.0.0.1", port=port, log_level="warning",
+    ))
+    server_thread = threading.Thread(target=server.run, daemon=True)
     browser = context = video = None
     app_started = False
     actions = []
     try:
-        demo.queue(max_size=8).launch(
-            server_name="127.0.0.1", server_port=port, share=False, inbrowser=False,
-            prevent_thread_lock=True, quiet=True,
-            footer_links=[], max_file_size="100mb",
-            theme=build_theme(), css=CSS, head=HEAD, favicon_path=str(FAVICON),
-            allowed_paths=[str(ROOT / "outputs/demo")],
-        )
+        server_thread.start()
         app_started = True
+        deadline = time.monotonic() + 30
+        while True:
+            try:
+                urllib.request.urlopen(f"http://127.0.0.1:{port}/api/status", timeout=2).close()
+                break
+            except OSError:
+                if time.monotonic() > deadline:
+                    raise RuntimeError("A aplicação local não respondeu a tempo.")
+                time.sleep(.2)
         with sync_playwright() as playwright:
             executable = args.browser_executable or Path(playwright.chromium.executable_path)
             if not executable.is_file():
@@ -192,18 +202,18 @@ def record(args) -> Path:
                 before = time.monotonic()
                 page.get_by_role("button", name="Analisar imagem", exact=True).click()
                 page.wait_for_function(
-                    "previous => Array.from(document.querySelectorAll('p')).some(p => "
-                    "p.innerText.includes('Processamento:') && p.innerText !== previous)",
+                    "previous => { const meta = document.querySelector('#image-meta'); "
+                    "return !document.querySelector('#result-image').hidden && "
+                    "meta.innerText.includes('Processamento') && meta.innerText !== previous; }",
                     arg=previous_status, timeout=args.timeout * 1000,
                 )
-                statuses = page.get_by_text("Processamento:", exact=False)
-                previous_status = statuses.last.inner_text()
-                if not previous_status or "Processamento:" not in previous_status:
+                previous_status = page.locator("#image-meta").inner_text()
+                if not previous_status or "Processamento" not in previous_status:
                     raise RuntimeError("A interface não apresentou um resultado real de imagem.")
                 actions.append({"kind": "image", "image_id": row["image_id"],
                                 "wait_seconds": time.monotonic() - before,
                                 "status": previous_status})
-                page.get_by_text("Detecções", exact=True).first.scroll_into_view_if_needed()
+                page.locator("#detections").scroll_into_view_if_needed()
                 hold(page, 5)
                 page.get_by_role("heading", name="OlhoLimpo", exact=True).scroll_into_view_if_needed()
                 hold(page, 6)
@@ -214,7 +224,7 @@ def record(args) -> Path:
             hold(page, 3)
             before = time.monotonic()
             page.get_by_role("button", name="Analisar vídeo", exact=True).click()
-            page.get_by_text("processing_fps", exact=False).first.wait_for(timeout=args.timeout * 1000)
+            page.locator("#result-video:not([hidden])").wait_for(timeout=args.timeout * 1000)
             actions.append({"kind": "video_montage", "source_image_ids": [
                 row["image_id"] for row in examples], "wait_seconds": time.monotonic() - before,
                 "source_is_real_capture": False})
@@ -283,7 +293,8 @@ def record(args) -> Path:
             with suppress(Exception):
                 browser.close()
         if app_started:
-            demo.close()
+            server.should_exit = True
+            server_thread.join(timeout=10)
 
 
 def main():
