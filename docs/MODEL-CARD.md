@@ -6,7 +6,7 @@ Localizar objetos visualmente semelhantes aos resíduos anotados no TACO, em ima
 
 ## Identificação e resultados
 
-A fonte dos dados de execução é `reports/metrics.json`. O relatório gerado por `scripts/build_report.py` apresenta os valores efetivamente registrados. O hash do checkpoint identifica os pesos avaliados; uma nova execução requer atualizar as métricas e regenerar o documento.
+A fonte dos dados de execução é `reports/metrics.json`. O relatório técnico apresenta os valores efetivamente registrados. O hash do checkpoint identifica os pesos avaliados; uma nova execução requer atualizar as métricas e regenerar o documento.
 
 Os parâmetros completos de treinamento e a origem dos pesos devem acompanhar o checkpoint. O modelo usa uma classe agregada, `residuo`; os rótulos originais são preservados no manifesto do dataset.
 
