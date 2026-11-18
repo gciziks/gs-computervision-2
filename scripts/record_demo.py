@@ -126,7 +126,7 @@ def record(args) -> Path:
     from playwright.sync_api import sync_playwright
     import gradio as gr
 
-    from app.main import CSS, build_app
+    from app.main import CSS, FAVICON, HEAD, build_app, build_theme
 
     workspace = ROOT / "tmp/recording" / uuid4().hex
     workspace.mkdir(parents=True)
@@ -145,7 +145,7 @@ def record(args) -> Path:
             server_name="127.0.0.1", server_port=port, share=False, inbrowser=False,
             prevent_thread_lock=True, quiet=True,
             footer_links=[], max_file_size="100mb",
-            theme=gr.themes.Base(primary_hue="emerald", neutral_hue="slate"), css=CSS,
+            theme=build_theme(), css=CSS, head=HEAD, favicon_path=str(FAVICON),
             allowed_paths=[str(ROOT / "outputs/demo")],
         )
         app_started = True

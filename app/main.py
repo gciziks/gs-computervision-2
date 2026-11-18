@@ -12,18 +12,174 @@ from app.presentation import build_presentation
 
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
-CSS = """
-.gradio-container { max-width: 1320px !important; }
-#intro { max-width: 74ch; margin-bottom: 1.25rem; }
-#model-status { font-size: .9rem; }
-#methodology { max-width: 80ch; }
-#presentation p, #presentation ul { max-width: 80ch; }
-#presentation h3 { margin-top: 1.5rem; margin-bottom: .6rem; }
-#presentation table { font-variant-numeric: tabular-nums; }
-#presentation a { text-underline-offset: .18em; }
-button:focus-visible, input:focus-visible { outline: 2px solid #17644d; outline-offset: 3px; }
-::selection { background: #c6e6d9; color: #12392c; }
+FAVICON = ROOT / "assets" / "icon.svg"
+
+# Identidade "caderno de vistoria": papel frio quadriculado, tinta verde-abeto e
+# âmbar de sinalização reservado às molduras de visor que enquadram as imagens.
+PALETTE = {
+    "paper": "#eef1ec", "sheet": "#fbfcfa", "ink": "#16291f", "muted": "#56685d",
+    "rule": "#cbd4cb", "moss": "#2c674c", "moss_deep": "#1d4a36", "signal": "#d99a12",
+    "paper_dark": "#121c17", "sheet_dark": "#19261f", "ink_dark": "#e3eae4",
+    "muted_dark": "#9db0a4", "rule_dark": "#2d3f35", "moss_dark": "#62b08a", "signal_dark": "#f0b93d",
+}
+
+HEAD = (
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&display=swap">'
+)
+
+HEADER = """
+<header class="ol-header">
+  <div class="ol-frame">
+    <span class="ol-tag" aria-hidden="true">resíduo 0,35+</span>
+    <h1>OlhoLimpo</h1>
+  </div>
+  <p>Detector de resíduos em imagens e vídeos. Envie um arquivo, ajuste a confiança
+  mínima e confira cada região apontada pelo modelo treinado com o TACO.</p>
+</header>
 """
+
+CSS = """
+:root {
+  --ol-paper: %(paper)s; --ol-sheet: %(sheet)s; --ol-ink: %(ink)s; --ol-muted: %(muted)s;
+  --ol-rule: %(rule)s; --ol-moss: %(moss)s; --ol-signal: %(signal)s;
+}
+.dark {
+  --ol-paper: %(paper_dark)s; --ol-sheet: %(sheet_dark)s; --ol-ink: %(ink_dark)s;
+  --ol-muted: %(muted_dark)s; --ol-rule: %(rule_dark)s; --ol-moss: %(moss_dark)s;
+  --ol-signal: %(signal_dark)s;
+}
+body, gradio-app {
+  background-color: var(--ol-paper) !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--ol-ink) 5%%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ol-ink) 5%%, transparent) 1px, transparent 1px) !important;
+  background-size: 28px 28px !important;
+}
+.gradio-container { max-width: 1280px !important; font-variant-numeric: tabular-nums; }
+::selection { background: color-mix(in srgb, var(--ol-signal) 40%%, transparent); color: var(--ol-ink); }
+:is(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--ol-signal) !important; outline-offset: 3px;
+}
+
+/* Cabeçalho: a marca é enquadrada como uma detecção do próprio modelo. */
+.ol-header { display: grid; gap: 1.1rem; padding: 2.25rem 0 1.5rem; }
+.ol-frame { position: relative; justify-self: start; padding: .5rem 1.1rem .35rem; }
+.ol-frame::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  --c: var(--ol-signal); --l: 18px; --w: 3px;
+  background-image: linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c));
+  background-position: 0 0, 0 0, 100%% 0, 100%% 0, 0 100%%, 0 100%%, 100%% 100%%, 100%% 100%%;
+  background-size: var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l);
+  background-repeat: no-repeat;
+}
+.ol-tag {
+  position: absolute; left: 0; bottom: 100%%; padding: .1rem .45rem;
+  background: var(--ol-signal); color: #1b1404; font-size: .72rem; font-weight: 600;
+  letter-spacing: .01em; line-height: 1.4;
+}
+.ol-header h1 {
+  margin: 0 !important; color: var(--ol-ink) !important;
+  font-size: clamp(2.6rem, 6vw, 4.4rem) !important; font-weight: 800 !important;
+  font-stretch: 125%%; font-variation-settings: "wdth" 125; letter-spacing: -.02em; line-height: 1;
+}
+.ol-header p { margin: 0; max-width: 62ch; color: var(--ol-muted); font-size: 1.05rem; line-height: 1.55; }
+
+/* Faixa de controle: estado do modelo e limiar lado a lado. */
+#inference-controls {
+  background: var(--ol-sheet); border: 1px solid var(--ol-rule); border-left: 4px solid var(--ol-moss);
+  border-radius: 6px; padding: .85rem 1.1rem; gap: .35rem;
+}
+#inference-controls > .block { border: 0 !important; box-shadow: none !important; padding: 0 !important; background: transparent !important; }
+#model-status, #model-status p { font-size: .9rem; color: var(--ol-muted); margin: 0; }
+#model-status strong { color: var(--ol-ink); }
+
+/* Abas como fichas de um arquivo. */
+.tab-wrapper, .tab-container { border-bottom-color: var(--ol-rule) !important; }
+button[role="tab"] { font-weight: 600 !important; font-size: 1rem !important; padding-inline: 1.1rem !important; }
+button[role="tab"][aria-selected="true"] { color: var(--ol-ink) !important; }
+
+/* Molduras de visor nas imagens de entrada e resultado. */
+.viewfinder { position: relative; overflow: visible !important; }
+.viewfinder::after {
+  content: ""; position: absolute; inset: -5px; pointer-events: none; z-index: 2;
+  --c: var(--ol-rule); --l: 22px; --w: 2px;
+  background-image: linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c));
+  background-position: 0 0, 0 0, 100%% 0, 100%% 0, 0 100%%, 0 100%%, 100%% 100%%, 100%% 100%%;
+  background-size: var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l), var(--l) var(--w), var(--w) var(--l);
+  background-repeat: no-repeat;
+}
+.viewfinder.result::after { --c: var(--ol-signal); }
+
+#image-status, #image-status p { font-size: .95rem; line-height: 1.55; }
+#image-status strong { color: var(--ol-moss); }
+.table-wrap, table, .cell-wrap { font-family: inherit !important; }
+.ol-file .empty { height: 4.5rem !important; min-height: 0 !important; }
+.ol-file .empty .icon { height: 1.4rem; opacity: .5; }
+
+#methodology { max-width: 80ch; margin: 2rem auto 0; }
+#presentation p, #presentation ul { max-width: 78ch; line-height: 1.6; }
+#presentation h2 { font-stretch: 115%%; font-variation-settings: "wdth" 115; font-weight: 800; letter-spacing: -.01em; }
+#presentation h3 { margin-top: 1.75rem; margin-bottom: .6rem; font-weight: 700; }
+#presentation table { font-variant-numeric: tabular-nums; border-collapse: collapse; }
+#presentation :is(table, tr) { border: 0 !important; box-shadow: none !important; }
+#presentation :is(th, td) { border: 0 !important; border-bottom: 1px solid var(--ol-rule) !important; padding: .55rem 1.25rem .55rem 0 !important; background: transparent !important; }
+#presentation th { color: var(--ol-muted); font-weight: 600; border-bottom: 2px solid var(--ol-ink) !important; }
+#presentation a { color: var(--ol-moss); text-underline-offset: .18em; }
+
+@media (max-width: 640px) {
+  .ol-header { padding-top: 1.75rem; }
+  #inference-controls { padding: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+""" % PALETTE
+
+
+def build_theme():
+    import gradio as gr
+
+    p = PALETTE
+    font = ["Archivo", "ui-sans-serif", "system-ui", "sans-serif"]
+    mono = ["JetBrains Mono", "ui-monospace", "Consolas", "monospace"]
+    return gr.themes.Base(
+        primary_hue="emerald", neutral_hue="stone", font=font, font_mono=mono,
+        radius_size=gr.themes.sizes.radius_sm,
+    ).set(
+        body_background_fill=p["paper"], body_background_fill_dark=p["paper_dark"],
+        body_text_color=p["ink"], body_text_color_dark=p["ink_dark"],
+        body_text_color_subdued=p["muted"], body_text_color_subdued_dark=p["muted_dark"],
+        background_fill_primary=p["sheet"], background_fill_primary_dark=p["sheet_dark"],
+        background_fill_secondary=p["paper"], background_fill_secondary_dark=p["paper_dark"],
+        block_background_fill=p["sheet"], block_background_fill_dark=p["sheet_dark"],
+        block_border_color=p["rule"], block_border_color_dark=p["rule_dark"],
+        border_color_primary=p["rule"], border_color_primary_dark=p["rule_dark"],
+        block_shadow="none", block_shadow_dark="none",
+        block_label_background_fill=p["sheet"], block_label_background_fill_dark=p["sheet_dark"],
+        block_label_text_color=p["muted"], block_label_text_color_dark=p["muted_dark"],
+        block_label_border_color=p["rule"], block_label_border_color_dark=p["rule_dark"],
+        block_title_text_weight="600", block_label_text_weight="600",
+        color_accent=p["moss"], color_accent_soft="#dde9e1", color_accent_soft_dark="#21382c",
+        border_color_accent=p["moss"], border_color_accent_dark=p["moss_dark"],
+        slider_color=p["moss"], slider_color_dark=p["moss_dark"],
+        loader_color=p["signal"], loader_color_dark=p["signal_dark"],
+        link_text_color=p["moss"], link_text_color_dark=p["moss_dark"],
+        input_background_fill=p["sheet"], input_background_fill_dark=p["sheet_dark"],
+        input_border_color=p["rule"], input_border_color_dark=p["rule_dark"],
+        input_border_color_focus=p["moss"], input_border_color_focus_dark=p["moss_dark"],
+        table_border_color=p["rule"], table_border_color_dark=p["rule_dark"],
+        table_even_background_fill=p["sheet"], table_even_background_fill_dark=p["sheet_dark"],
+        table_odd_background_fill="#f3f6f2", table_odd_background_fill_dark="#1d2b23",
+        code_background_fill="#e4e9e3", code_background_fill_dark="#22332a",
+        button_primary_background_fill=p["moss"], button_primary_background_fill_dark=p["moss_dark"],
+        button_primary_background_fill_hover=p["moss_deep"],
+        button_primary_background_fill_hover_dark="#7cc3a0",
+        button_primary_text_color="#ffffff", button_primary_text_color_dark="#0e1a14",
+        button_primary_border_color=p["moss"], button_primary_border_color_dark=p["moss_dark"],
+        button_secondary_background_fill=p["sheet"], button_secondary_background_fill_dark=p["sheet_dark"],
+        button_secondary_border_color=p["rule"], button_secondary_border_color_dark=p["rule_dark"],
+        button_large_text_weight="700", button_large_radius="6px",
+        button_transform_active="translateY(1px)",
+    )
 
 
 def _rows(detections: list[dict]) -> list[list]:
@@ -85,9 +241,9 @@ class DemoController:
         if self._detector is not None:
             info = self._detector.model_info
             return (
-                f"Modelo: **{Path(info.get('path', self.weights)).name}** · "
-                f"dispositivo: **{info.get('device', self.device)}** · "
-                f"SHA-256: `{str(info.get('sha256', 'não informado'))[:12]}`"
+                f"Modelo **{Path(info.get('path', self.weights)).name}** carregado em "
+                f"**{info.get('device', self.device)}**, SHA-256 "
+                f"`{str(info.get('sha256', 'não informado'))[:12]}`"
             )
         if not self.weights.is_file():
             return (
@@ -95,8 +251,8 @@ class DemoController:
                 "checkpoint customizado. Nenhum modelo genérico será usado em seu lugar."
             )
         return (
-            f"Modelo: **{self.weights.name}** · dispositivo solicitado: **{self.device}**. "
-            "Carregamento na primeira análise."
+            f"Modelo **{self.weights.name}** pronto para carregar em **{self.device}** "
+            "na primeira análise."
         )
 
     def _destination(self) -> Path:
@@ -187,12 +343,7 @@ def build_app(
     controller = DemoController(weights=weights, device=device, imgsz=imgsz)
     headers = ["Objeto", "Confiança", "x1", "y1", "x2", "y2"]
     with gr.Blocks(title="OlhoLimpo", analytics_enabled=False) as demo:
-        gr.Markdown(
-            "# OlhoLimpo\n"
-            "Detecção de resíduos em imagens e vídeos. Envie um arquivo, ajuste a confiança "
-            "e confira as regiões apontadas pelo modelo customizado.",
-            elem_id="intro",
-        )
+        gr.HTML(HEADER, elem_id="intro")
         with gr.Column(elem_id="inference-controls") as inference_controls:
             model_status = gr.Markdown(controller.model_status(), elem_id="model-status")
             confidence = gr.Slider(
@@ -209,6 +360,7 @@ def build_app(
                     image_input = gr.Image(
                         label="Imagem de entrada (até 20 MB)",
                         type="filepath", image_mode="RGB", sources=["upload"],
+                        elem_classes=["viewfinder"],
                     )
                     image_button = gr.Button("Analisar imagem", variant="primary")
                     samples = sorted(
@@ -223,8 +375,13 @@ def build_app(
                             cache_examples=False,
                         )
                 with gr.Column():
-                    image_output = gr.Image(label="Resultado", type="numpy", interactive=False)
-                    image_status = gr.Markdown("O resultado aparecerá após a análise.")
+                    image_output = gr.Image(
+                        label="Resultado", type="numpy", interactive=False,
+                        elem_classes=["viewfinder", "result"],
+                    )
+                    image_status = gr.Markdown(
+                        "As regiões detectadas aparecem aqui depois da análise.", elem_id="image-status"
+                    )
             detections = gr.Dataframe(
                 headers=headers,
                 datatype=["str", "number", "number", "number", "number", "number"],
@@ -234,9 +391,9 @@ def build_app(
                 wrap=True,
             )
             with gr.Row():
-                image_file = gr.File(label="Imagem anotada", interactive=False)
-                image_json = gr.File(label="Detecções em JSON", interactive=False)
-                image_csv = gr.File(label="Detecções em CSV", interactive=False)
+                image_file = gr.File(label="Imagem anotada", interactive=False, elem_classes=["ol-file"])
+                image_json = gr.File(label="Detecções em JSON", interactive=False, elem_classes=["ol-file"])
+                image_csv = gr.File(label="Detecções em CSV", interactive=False, elem_classes=["ol-file"])
             image_button.click(
                 controller.analyze_image,
                 inputs=[image_input, confidence],
@@ -256,14 +413,18 @@ def build_app(
                 "O arquivo é processado antes da reprodução; o resumo informa a velocidade medida."
             )
             with gr.Row():
-                video_input = gr.Video(label="Vídeo de entrada", sources=["upload"])
-                video_output = gr.Video(label="Vídeo anotado", interactive=False)
+                video_input = gr.Video(
+                    label="Vídeo de entrada", sources=["upload"], elem_classes=["viewfinder"]
+                )
+                video_output = gr.Video(
+                    label="Vídeo anotado", interactive=False, elem_classes=["viewfinder", "result"]
+                )
             video_button = gr.Button("Analisar vídeo", variant="primary")
             video_summary = gr.JSON(label="Resumo do processamento")
             with gr.Row():
-                video_file = gr.File(label="Vídeo anotado", interactive=False)
-                video_json = gr.File(label="Detecções em JSON", interactive=False)
-                video_csv = gr.File(label="Detecções em CSV", interactive=False)
+                video_file = gr.File(label="Vídeo anotado", interactive=False, elem_classes=["ol-file"])
+                video_json = gr.File(label="Detecções em JSON", interactive=False, elem_classes=["ol-file"])
+                video_csv = gr.File(label="Detecções em CSV", interactive=False, elem_classes=["ol-file"])
             video_button.click(
                 controller.analyze_video,
                 inputs=[video_input, confidence],
@@ -316,8 +477,10 @@ def main():
         inbrowser=False,
         footer_links=[],
         max_file_size="100mb",
-        theme=gr.themes.Base(primary_hue="emerald", neutral_hue="slate"),
+        theme=build_theme(),
         css=CSS,
+        head=HEAD,
+        favicon_path=str(FAVICON),
         allowed_paths=[str(ROOT / "outputs" / "demo")],
     )
 
